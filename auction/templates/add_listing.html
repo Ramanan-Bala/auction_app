@@ -1,0 +1,22 @@
+{% extends 'base_layout.html' %} {% block body %}
+<form action="{% url 'add-listing' %}" method="post">
+  {% csrf_token %}
+  <label for="title">Title:</label>
+  <input required autofocus type="text" id="title" name="title" />
+  <br />
+  <label for="description">Description:</label>
+  <input required type="text" id="description" name="description" />
+  <br />
+  <label for="startingBid">Starting Bid:</label>
+  <input required type="text" id="startingBid" name="startingBid" />
+  <br />
+  <label for="category">Category:</label>
+  <select name="category" id="category">
+    {% for c in category %}
+    <option value="{{c.id}}">{{c.category}}</option>
+    {% endfor %}
+  </select>
+  <br />
+  <input type="submit" value="Submit" />
+</form>
+{% endblock %}

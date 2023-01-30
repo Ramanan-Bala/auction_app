@@ -1,0 +1,18 @@
+<h1>Register</h1>
+
+<form action="{% url 'register' %}" method="POST">
+  {% csrf_token %}
+  <label for="user_name">User Name:</label>
+  <input required autofocus type="text" id="user_name" name="username" />
+  <br />
+  <label for="email">Email:</label>
+  <input required type="text" id="email" name="email" />
+  <br />
+  <label for="password">Password:</label>
+  <input required type="text" id="password" name="password" />
+  <br />
+  <label for="confirm_password">Confirm Password:</label>
+  <input required type="text" id="confirm_password" name="confirm_password" />
+  <br />
+  <input type="submit" value="Submit" />
+</form>
