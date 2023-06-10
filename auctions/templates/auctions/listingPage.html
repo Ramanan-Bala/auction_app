@@ -1,0 +1,114 @@
+{% extends "auctions/layout.html" %}
+{% block header %} Listing: {{list.title}} {% endblock %}
+{% block body %}
+
+{% if error %}
+<div id="message" class="slide absolute text-center bg-transparent text-center py-4 lg:px-4">
+	<div class="p-2 bg-red-700 items-center text-red-100 leading-none rounded-full inline-flex" role="alert">
+		<span class="flex rounded-full bg-red-500 uppercase px-2 py-1 text-xs font-bold mr-3">Error</span>
+		<span class="font-semibold mr-2 text-left flex-auto">{{ error }}</span>
+	</div>
+</div>
+{% endif %}
+{% if success %}
+<div id="message" class="slide absolute bg-transparent text-center py-4 lg:px-4">
+	<div class="p-2 bg-green-700 items-center text-green-100 leading-none rounded-full inline-flex" role="alert">
+		<span class="flex rounded-full bg-green-500 uppercase px-2 py-1 text-xs font-bold mr-3">Success</span>
+		<span class="font-semibold mr-2 text-left flex-auto">{{ success }}</span>
+	</div>
+</div>
+{% endif %}
+{% if list.active == False %}
+<div id="message" class="place absolute bg-transparent text-center py-4 lg:px-4">
+	<div class="p-2 bg-green-700 items-center text-green-100 leading-none rounded-full inline-flex" role="alert">
+		<span class="flex rounded-full bg-green-500 uppercase px-2 py-1 text-xs font-bold mr-3">Owned</span>
+		<span class="font-semibold mr-2 text-left flex-auto">{{ list.buyer }} bought this item for Rs.{{list.currentBid}}</span>
+	</div>
+</div>
+{% endif %}
+
+<div class="bg-white rounded-xl shadow-lg m-2 rounded-xl grid grid-cols-6 gap-16 ">
+	<div class="col-start-1 col-span-2">
+		<img class="object-fit" style="width:30rem;height:30rem" src="{{list.image}}" alt="No image found" />
+	</div>
+	<div class="col-span-4 col-end-7">
+		<div class="details">
+			<h2 class="mb-4 font-semibold">{{list.title}}<br>
+				<span>{{list.category}}</span>
+			</h2>
+			<p class="text-xl font-semibold text-gray-800">Details:</p>
+			<ul class="ml-4 list-disc list-inside">
+				<li>Owner: {{list.createdBy}}</li>
+				<li>Category: {{list.category}}</li>
+				{% if list.description %}
+				<li>{{list.description}}</li>
+				{% endif %}
+				<li>Current Price: ₹{{list.currentBid }}</li>
+			</ul>
+			<div>
+				{% if user.is_authenticated and list.active %}
+				<form action="{% url 'bidding' list.id %}" method="POST" class="mt-4 mb-4">
+					{% csrf_token %}
+					<div>
+						<span class="text-md font-semibold">Bid: ₹</span>
+						<input required class="border outline-none border-gray-400 rounded p-1" type="number" min="{{ list.currentBid }}" step="0.01" name="bid" placeholder=" >{{ list.currentBid }}">
+						<button type="submit" class="bg-gray-800 px-2 m-2 p-1 rounded text-gray-300 font-semibold text-sm">Place Bid</button>
+					</div>
+				</form>
+				{% endif %}
+			</div>
+			<div class="flex justify-around items-start">
+				<h3 class="text-5xl float-left text-gray-600">Rs. {{list.startingBid}}</h3>
+				{% if user.is_authenticated and list.active %}
+				<div class="mt-5">
+					{% if added %}
+					<a href="{% url 'removeWatchlist' list.id %}" class="bg-red-500 text-white rounded-lg shadow-md hover:bg-red-700">
+						Remove from Watchlist
+					</a>
+					{% else %}
+					<a href="{% url 'addWatchlist' list.id %}" class="bg-green-500 text-white rounded-lg shadow-md hover:bg-green-700">
+						Add to Watchlist
+					</a>
+					{% endif %}
+				</div>
+				{% if user == list.createdBy %}
+				<a href="{% url 'closeBid' list.id %}" class="bg-yellow-500 text-white rounded-lg shadow-md hover:bg-yellow-700">
+					Close Bid
+				</a>
+				{% endif %}
+				{% endif %}
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="bg-white rounded-xl shadow-lg p-4">
+	{% if user.is_authenticated %}
+	<form action="{% url 'submitComment' list.id %}" method="POST">
+		{% csrf_token %}
+		<h3 class="text-2xl font-semibold">Write a comment:</h3>
+		<textarea class="border outline-none border-gray-400 rounded p-1" name="comment" rows="6" cols="80" placeholder="Comment here...."></textarea><br>
+		<button type="submit" class="bg-gray-800 px-2 p-1 rounded text-gray-300 font-semibold text-sm">Submit</button>
+	</form>
+	{% endif %}
+	<div class="mt-4">
+		<h3 class="text-2xl font-semibold">Comments:</h3>
+		<div class="mt-4 mx-auto">
+			<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+				{% if comments|length == 0 %}
+				<h1 class="text-xl font-bold">No comments Yet...</h1>
+				{% endif %}
+				{% for comment in comments %}
+				<div class="card m-2 border border-gray-400 rounded-lg hover:shadow-md hover:border-opacity-0 transform hover:-translate-y-1 transition-all duration-200">
+					<div class="m-3">
+						<p>Comment By: {{comment.user}}</p>
+						<p>{{comment.comment}}</p>
+						<p>{{comment.created_date}}</p>
+					</div>
+				</div>
+				{% endfor %}
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}

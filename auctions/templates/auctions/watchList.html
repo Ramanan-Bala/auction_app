@@ -1,0 +1,90 @@
+{% extends "auctions/layout.html" %}
+{% block header %}
+Watchlist
+{% endblock %}
+{% block body %}
+
+{% if message %}
+<div id="message" class="bg-transparent text-center py-4 lg:px-4">
+	<div class="p-2 bg-green-700 items-center text-green-100 leading-none rounded-full inline-flex" role="alert">
+		<span class="flex rounded-full bg-green-500 uppercase px-2 py-1 text-xs font-bold mr-3">Success</span>
+		<span class="font-semibold mr-2 text-left flex-auto">{{ message }}</span>
+	</div>
+</div>
+{% endif %}
+
+<div class="font-sans quicksand">
+	<div class="grid md:grid-cols-2 sm:grid-cols-1 xl:grid-cols-3 gap-6 m-5 mb-10 sm:px-6 lg:px-8">
+		{% for list in lists %}
+		<a href="{% url 'listingPage' list.id %}">
+			<div id="app" class="bg-white w-128 h-60 rounded-xl shadow-md md:flex block text-grey-darkest">
+				<img class="w-full md:h-48 object-cover md:rounded-l-xl md:rounded-t-none rounded-t-xl h-64 md:w-48 sm:w-72" src="{{list.image}}" alt="Room Image">
+				<div class="w-full flex flex-col">
+					<div class="p-4 pb-0 flex-1">
+						<h3 class="font-semibold text-2xl mb-1 text-indigo-600">{{list.title}}</h3>
+						<div class="text-xs flex items-center mb-4">
+							<i class="fas fa-map-marker-alt mr-1 mt-1 text-grey-dark"></i>
+							{{list.category}}
+						</div>
+
+						<span class="text-md font-medium">Starting Bid:<span class="text-md text-grey-darkest">₹ {{list.startingBid}}</span></span><br />
+						<span class="text-md font-medium">Current Bid:<span class="text-md text-grey-darkest">₹ {{list.currentBid}}</span></span>
+
+						<div class="flex sm:mb-4 items-end">
+							<div class="pr-6 text-xs">
+								<i class="fas fa-user mt-6 text-green"></i> {{list.createdBy}}
+							</div>
+							<div class="text-xs">
+								<i class="text-grey-darker fas fa-calendar"></i> {{list.created_date|date:"j-n-Y"}}
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</a>
+		{% endfor %}
+	</div>
+</div>
+{% if message %}
+<script>
+	message = document.getElementById("message")
+
+	setTimeout(function() {
+		message.style.display = "none";
+	}, 2000);
+</script>
+{% endif %}
+{% endblock %}
+
+<h1 class="text-5xl font-semibold text-gray-800">{{list.title}}</h1>
+<p class="text-xl font-bold text-gray-800"><span class="text-lg font-semibold">Starting Bid: </span>₹{{list.startingBid }}</p>
+{% if user.is_authenticated %}
+<form action="{% url 'bidding' list.id %}" method="POST" class="mt-4 mb-4">
+	{% csrf_token %}
+	<div>
+		<span class="text-md font-semibold">Bid: ₹</span>
+		<input required class="border outline-none border-gray-400 rounded p-1" type="number" min="{{ list.currentBid }}" step="0.01" name="bid" placeholder=" >{{ list.currentBid }}">
+		<button type="submit" class="bg-gray-800 px-2 m-2 p-1 rounded text-gray-300 font-semibold text-sm">Place Bid</button>
+	</div>
+</form>
+{% endif %}
+<p class="text-xl font-semibold text-gray-800">Details:</p>
+<ul class="ml-4">
+	<li>Listed By: {{list.createdBy}}</li>
+	<li>Category: {{list.category}}</li>
+	<li>{{list.description}}</li>
+	<li>Current Price: ₹{{list.currentBid }}</li>
+</ul>
+<div class="mt-5">
+	{% if user.is_authenticated %}
+	{% if added %}
+	<a href="{% url 'removeWatchlist' list.id %}" class="align-top mx-auto mt-1 py-1 text-sm px-2 bg-red-500 text-white rounded-lg shadow-md hover:bg-red-700">
+		Remove from Watchlist
+	</a>
+	{% else %}
+	<a href="{% url 'addWatchlist' list.id %}" class="align-top mx-auto mt-1 py-1 text-sm px-2 bg-green-500 text-white rounded-lg shadow-md hover:bg-green-700">
+		Add to Watchlist
+	</a>
+	{% endif %}
+	{% endif %}
+</div>

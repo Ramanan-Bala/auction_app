@@ -1,0 +1,48 @@
+{% extends "auctions/layout.html" %}
+{% block body %}
+<header class="bg-white shadow ">
+	<div class="flex items-center py-6 px-4 sm:px-6 lg:px-8">
+		<h1 class="text-3xl font-bold text-gray-900">{% if header %}Category: {{c}}{% else %}{{title}}{% endif %}</h1>
+		<div class="absolute right-0">
+			{% for c in cat %}
+			<a class="mr-10 font-semibold bg-gray-200 hover:bg-gray-400 rounded p-1 text-sm" href="{% url 'category' c %}">{{c}}</a>
+			{% endfor %}
+		</div>
+	</div>
+</header>
+<div class="font-sans quicksand">
+	<div class="grid sm:grid-cols-2 xl:grid-cols-3 gap-6 m-5 mb-10 sm:px-6 lg:px-8">
+		{% for list in lists %}
+		<a href="{% url 'listingPage' list.id %}">
+			<div id="app" class="bg-white w-128 h-60 rounded-xl shadow-md md:flex block text-grey-darkest">
+				<img class="w-full md:h-48 object-cover md:rounded-l-xl md:rounded-t-none rounded-t-xl h-64 md:w-48 sm:w-72" src="{{list.image}}" alt="Room Image">
+				<div class="w-full flex flex-col">
+					<div class="p-4 pb-0 flex-1">
+						<h3 class="font-semibold text-2xl mb-1 text-indigo-600">{{list.title}}</h3>
+						<div class="text-xs flex items-center mb-4">
+							<i class="fas fa-map-marker-alt mr-1 mt-1 text-grey-dark"></i>
+							{{list.category}}
+						</div>
+
+						<span class="text-md font-medium">Starting Bid:<span class="text-md text-grey-darkest">₹ {{list.startingBid}}</span></span><br />
+						<span class="text-md font-medium">Current Bid:<span class="text-md text-grey-darkest">₹ {{list.currentBid}}</span></span>
+
+						<div class="flex sm:mb-4 items-end">
+							<div class="pr-6 text-xs">
+								<i class="fas fa-user mt-6 text-green"></i> {{list.createdBy}}
+							</div>
+							<div class="text-xs">
+								<i class="text-grey-darker fas fa-calendar"></i> {{list.created_date|date:"j-n-Y"}}
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</a>
+		{% endfor %}
+		{% if lists|length == 0 %}
+		<h1 class="text-3xl font-bold text-gray-900">No auction in this category...</h1>
+		{% endif %}
+	</div>
+</div>
+{% endblock %}
